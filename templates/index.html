@@ -1,0 +1,104 @@
+<!-- index.html -->
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>Network Traffic Analysis</title>
+</head>
+<body>
+    <h1>Network Traffic Analysis</h1>
+    <p>Enter the criteria to filter the network packets:</p>
+    <form>
+        <label for="src">Source IP:</label>
+        <input type="text" id="src" name="src">
+        <label for="dst">Destination IP:</label>
+        <input type="text" id="dst" name="dst">
+        <label for="proto">Protocol:</label>
+        <input type="text" id="proto" name="proto">
+        <label for="len">Length:</label>
+        <input type="text" id="len" name="len">
+        <button type="submit" id="submit">Submit</button>
+    </form>
+    <div id="results"></div>
+    <script>
+        // Get the elements
+        var form = document.querySelector("form");
+        var results = document.getElementById("results");
+
+        // Add an event listener for the submit button
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+            var src = form.src.value;
+            var dst = form.dst.value;
+            var proto = form.proto.value;
+            var len = form.len.value;
+            var url = "/api?";
+            if (src) {
+                url += "src=" + src + "&";
+            }
+            if (dst) {
+                url += "dst=" + dst + "&";
+            }
+            if (proto) {
+                url += "proto=" + proto + "&";
+            }
+            if (len) {
+                url += "len=" + len + "&";
+            }
+            fetch(url)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    results.innerHTML = "";
+                    if (data.results.length > 0) {
+                        var table = document.createElement("table");
+                        var thead = document.createElement("thead");
+                        var tr = document.createElement("tr");
+                        var th1 = document.createElement("th");
+                        th1.textContent = "Source IP";
+                        var th2 = document.createElement("th");
+                        th2.textContent = "Destination IP";
+                        var th3 = document.createElement("th");
+                        th3.textContent = "Protocol";
+                        var th4 = document.createElement("th");
+                        th4.textContent = "Length";
+                        tr.appendChild(th1);
+                        tr.appendChild(th2);
+                        tr.appendChild(th3);
+                        tr.appendChild(th4);
+                        thead.appendChild(tr);
+                        table.appendChild(thead);
+
+                        var tbody = document.createElement("tbody");
+
+                        for (var i = 0; i < data.results.length; i++) {
+                            var result = data.results[i];
+                            var tr = document.createElement("tr");
+                            var td1 = document.createElement("td");
+                            td1.textContent = result[0];
+                            var td2 = document.createElement("td");
+                            td2.textContent = result[1];
+                            var td3 = document.createElement("td");
+                            td3.textContent = result[2];
+                            var td4 = document.createElement("td");
+                            td4.textContent = result[3];
+                            tr.appendChild(td1);
+                            tr.appendChild(td2);
+                            tr.appendChild(td3);
+                            tr.appendChild(td4);
+                            tbody.appendChild(tr);
+                        }
+
+                        table.appendChild(tbody);
+                        results.appendChild(table);
+                    } else {
+                        results.textContent = "No packets match the criteria.";
+                    }
+                })
+                .catch(function(error) {
+                    results.textContent = "An error occurred: " + error;
+                });
+        });
+    </script>
+</body>
+</html>
