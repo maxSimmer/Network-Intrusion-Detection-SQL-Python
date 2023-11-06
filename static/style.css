@@ -2,12 +2,12 @@
 body, h1, p {
     margin: 0;
     padding: 0;
-    color: red;
+    color: black;
 }
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #a71e1e;
+    background-color: white;
 }
 
 h1 {
